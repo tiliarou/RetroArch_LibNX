@@ -433,6 +433,36 @@ static bool vita2d_font_init_first(
 }
 #endif
 
+#ifdef __SWITCH__
+static const font_renderer_t *switch_font_backends[] = {
+   &switch_font
+};
+
+static bool switch_font_init_first(
+      const void **font_driver, void **font_handle,
+      void *video_data, const char *font_path,
+      float font_size, bool is_threaded)
+{
+   unsigned i;
+
+   for (i = 0; switch_font_backends[i]; i++)
+   {
+      void *data = switch_font_backends[i]->init(
+            video_data, font_path, font_size,
+            is_threaded);
+
+      if (!data)
+         continue;
+
+      *font_driver = switch_font_backends[i];
+      *font_handle = data;
+      return true;
+   }
+
+   return false;
+}
+#endif
+
 #ifdef _3DS
 static const font_renderer_t *ctr_font_backends[] = {
    &ctr_font
@@ -547,6 +577,11 @@ static bool font_init_first(
 #ifdef _3DS
       case FONT_DRIVER_RENDER_CTR:
          return ctr_font_init_first(font_driver, font_handle,
+               video_data, font_path, font_size, is_threaded);
+#endif
+#ifdef __SWITCH__
+      case FONT_DRIVER_RENDER_SWITCH:
+         return switch_font_init_first(font_driver, font_handle,
                video_data, font_path, font_size, is_threaded);
 #endif
 #ifdef WIIU

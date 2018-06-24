@@ -52,7 +52,12 @@ static bool menu_display_switch_font_init_first(
       const char *font_path, float font_size,
       bool is_threaded)
 {
-   return true;
+   font_data_t **handle = (font_data_t**)font_handle;
+   *handle = font_driver_init_first(video_data,
+         font_path, font_size, true,
+         is_threaded,
+         FONT_DRIVER_RENDER_SWITCH);
+   return *handle;
 }
 
 static const float *menu_display_switch_get_default_vertices(void)
