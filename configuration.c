@@ -134,7 +134,7 @@ enum video_driver_enum
    VIDEO_PSP1,
    VIDEO_VITA2D,
    VIDEO_CTR,
-   VIDEO_SWITCH,
+   VIDEO_NX,
    VIDEO_D3D8,
    VIDEO_D3D9,
    VIDEO_D3D10,
@@ -177,7 +177,7 @@ enum audio_driver_enum
    AUDIO_RWEBAUDIO,
    AUDIO_PSP,
    AUDIO_CTR,
-   AUDIO_SWITCH,
+   AUDIO_NX,
    AUDIO_NULL
 };
 
@@ -200,7 +200,7 @@ enum input_driver_enum
    INPUT_PS3,
    INPUT_PSP,
    INPUT_CTR,
-   INPUT_SWITCH,
+   INPUT_NX,
    INPUT_XENON360,
    INPUT_WII,
    INPUT_WIIU,
@@ -223,7 +223,7 @@ enum joypad_driver_enum
    JOYPAD_XDK,
    JOYPAD_PSP,
    JOYPAD_CTR,
-   JOYPAD_SWITCH,
+   JOYPAD_NX,
    JOYPAD_DINPUT,
    JOYPAD_UDEV,
    JOYPAD_LINUXRAW,
@@ -303,7 +303,7 @@ static enum video_driver_enum VIDEO_DEFAULT_DRIVER = VIDEO_PSP1;
 #elif defined(_3DS)
 static enum video_driver_enum VIDEO_DEFAULT_DRIVER = VIDEO_CTR;
 #elif defined(SWITCH)
-static enum video_driver_enum VIDEO_DEFAULT_DRIVER = VIDEO_SWITCH;
+static enum video_driver_enum VIDEO_DEFAULT_DRIVER = VIDEO_NX;
 #elif defined(HAVE_XVIDEO)
 static enum video_driver_enum VIDEO_DEFAULT_DRIVER = VIDEO_XVIDEO;
 #elif defined(HAVE_SDL)
@@ -333,7 +333,7 @@ static enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_PSP;
 #elif defined(_3DS)
 static enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_CTR;
 #elif defined(SWITCH)
-static enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_SWITCH;
+static enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_NX;
 #elif defined(HAVE_PULSE)
 static enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_PULSE;
 #elif defined(HAVE_ALSA) && defined(HAVE_VIDEOCORE)
@@ -405,7 +405,7 @@ static enum input_driver_enum INPUT_DEFAULT_DRIVER = INPUT_PSP;
 #elif defined(_3DS)
 static enum input_driver_enum INPUT_DEFAULT_DRIVER = INPUT_CTR;
 #elif defined(SWITCH)
-static enum input_driver_enum INPUT_DEFAULT_DRIVER = INPUT_SWITCH;
+static enum input_driver_enum INPUT_DEFAULT_DRIVER = INPUT_NX;
 #elif defined(GEKKO)
 static enum input_driver_enum INPUT_DEFAULT_DRIVER = INPUT_WII;
 #elif defined(WIIU)
@@ -447,7 +447,7 @@ static enum joypad_driver_enum JOYPAD_DEFAULT_DRIVER = JOYPAD_PSP;
 #elif defined(_3DS)
 static enum joypad_driver_enum JOYPAD_DEFAULT_DRIVER = JOYPAD_CTR;
 #elif defined(SWITCH)
-static enum joypad_driver_enum JOYPAD_DEFAULT_DRIVER = JOYPAD_SWITCH;
+static enum joypad_driver_enum JOYPAD_DEFAULT_DRIVER = JOYPAD_NX;
 #elif defined(HAVE_DINPUT)
 static enum joypad_driver_enum JOYPAD_DEFAULT_DRIVER = JOYPAD_DINPUT;
 #elif defined(HAVE_UDEV)
@@ -627,7 +627,7 @@ const char *config_get_default_audio(void)
 #endif
       case AUDIO_CTR:
          return "csnd";
-      case AUDIO_SWITCH:
+      case AUDIO_NX:
          return "switch";
       case AUDIO_RWEBAUDIO:
          return "rwebaudio";
@@ -722,7 +722,7 @@ const char *config_get_default_video(void)
          return "vita2d";
       case VIDEO_CTR:
          return "ctr";
-      case VIDEO_SWITCH:
+      case VIDEO_NX:
          return "switch";
       case VIDEO_XVIDEO:
          return "xvideo";
@@ -780,7 +780,7 @@ const char *config_get_default_input(void)
 #endif
       case INPUT_CTR:
          return "ctr";
-      case INPUT_SWITCH:
+      case INPUT_NX:
          return "switch";
       case INPUT_SDL:
          return "sdl";
@@ -850,7 +850,7 @@ const char *config_get_default_joypad(void)
 #endif
       case JOYPAD_CTR:
          return "ctr";
-      case JOYPAD_SWITCH:
+      case JOYPAD_NX:
          return "switch";
       case JOYPAD_DINPUT:
          return "dinput";

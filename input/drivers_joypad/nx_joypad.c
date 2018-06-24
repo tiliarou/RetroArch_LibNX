@@ -1,3 +1,18 @@
+/*  RetroArch - A frontend for libretro.
+ *  Copyright (C) - RetroNX Team
+ *
+ *  RetroArch is free software: you can redistribute it and/or modify it under the terms
+ *  of the GNU General Public License as published by the Free Software Found-
+ *  ation, either version 3 of the License, or (at your option) any later version.
+ *
+ *  RetroArch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *  PURPOSE.  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with RetroArch.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "../../config.h"
 #endif
@@ -20,25 +35,25 @@ static uint16_t pad_state[MAX_PADS];
 static int16_t analog_state[MAX_PADS][2][2];
 extern uint64_t lifecycle_state;
 
-static const char *switch_joypad_name(unsigned pad)
+static const char *nx_joypad_name(unsigned pad)
 {
       return "Switch Controller";
 }
 
-static void switch_joypad_autodetect_add(unsigned autoconf_pad)
+static void nx_joypad_autodetect_add(unsigned autoconf_pad)
 {
       if (!input_autoconfigure_connect(
-              switch_joypad_name(autoconf_pad), /* name */
+              nx_joypad_name(autoconf_pad), /* name */
               NULL,                             /* display name */
-              switch_joypad.ident,              /* driver */
+              nx_joypad.ident,              /* driver */
               autoconf_pad,                     /* idx */
               0,                                /* vid */
               0))                               /* pid */
-            input_config_set_device_name(autoconf_pad, switch_joypad_name(autoconf_pad));
+            input_config_set_device_name(autoconf_pad, nx_joypad_name(autoconf_pad));
 }
 
 // This should be protected by the Input Mutex
-static bool switch_joypad_init(void *data)
+static bool nx_joypad_init(void *data)
 {
       // Scan Input
       hidScanInput();
@@ -46,7 +61,7 @@ static bool switch_joypad_init(void *data)
       // Uhh, should use actual detection with libnx, no?
       for (int i = 0; i < MAX_PADS; i++)
       {
-            switch_joypad_autodetect_add(i);
+            nx_joypad_autodetect_add(i);
       }
 
       printf("[Input]: HID initialized\n");
@@ -54,7 +69,7 @@ static bool switch_joypad_init(void *data)
       return true;
 }
 
-static bool switch_joypad_button(unsigned port_num, uint16_t key)
+static bool nx_joypad_button(unsigned port_num, uint16_t key)
 {
       if (port_num >= MAX_PADS)
             return false;
@@ -66,7 +81,7 @@ static bool switch_joypad_button(unsigned port_num, uint16_t key)
       return (pad_state[port_num] & (1 << key));
 }
 
-static void switch_joypad_get_buttons(unsigned port_num, input_bits_t *state)
+static void nx_joypad_get_buttons(unsigned port_num, input_bits_t *state)
 {
       if (port_num < MAX_PADS)
       {
@@ -78,7 +93,7 @@ static void switch_joypad_get_buttons(unsigned port_num, input_bits_t *state)
       }
 }
 
-static int16_t switch_joypad_axis(unsigned port_num, uint32_t joyaxis)
+static int16_t nx_joypad_axis(unsigned port_num, uint32_t joyaxis)
 {
       int val = 0;
       int axis = -1;
@@ -125,16 +140,16 @@ static int16_t switch_joypad_axis(unsigned port_num, uint32_t joyaxis)
       return val;
 }
 
-static bool switch_joypad_query_pad(unsigned pad)
+static bool nx_joypad_query_pad(unsigned pad)
 {
       return pad < MAX_PADS && pad_state[pad];
 }
 
-static void switch_joypad_destroy(void)
+static void nx_joypad_destroy(void)
 {
 }
 
-static void switch_joypad_poll(void)
+static void nx_joypad_poll(void)
 {
       hidScanInput();
 
@@ -156,14 +171,14 @@ static void switch_joypad_poll(void)
       }
 }
 
-input_device_driver_t switch_joypad = {
-    switch_joypad_init,
-    switch_joypad_query_pad,
-    switch_joypad_destroy,
-    switch_joypad_button,
-    switch_joypad_get_buttons,
-    switch_joypad_axis,
-    switch_joypad_poll,
+input_device_driver_t nx_joypad = {
+    nx_joypad_init,
+    nx_joypad_query_pad,
+    nx_joypad_destroy,
+    nx_joypad_button,
+    nx_joypad_get_buttons,
+    nx_joypad_axis,
+    nx_joypad_poll,
     NULL, /* set_rumble */
-    switch_joypad_name,
+    nx_joypad_name,
     "switch"};

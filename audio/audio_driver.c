@@ -124,7 +124,7 @@ static const audio_driver_t *audio_drivers[] = {
    &audio_ctr_dsp,
 #endif
 #ifdef SWITCH
-   &audio_switch,
+   &audio_nx,
 #endif
    &audio_null,
    NULL,

@@ -60,7 +60,7 @@ static frontend_ctx_driver_t *frontend_ctx_drivers[] = {
    &frontend_ctx_ctr,
 #endif
 #if defined(SWITCH)
-   &frontend_ctx_switch,
+   &frontend_ctx_nx,
 #endif
 #if defined(_WIN32) && !defined(_XBOX)
    &frontend_ctx_win32,

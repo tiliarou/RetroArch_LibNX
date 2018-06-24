@@ -46,7 +46,7 @@ HAVE_PTHREADS = 1
 
 OBJ = frontend/frontend_salamander.o \
 		frontend/frontend_driver.o \
-		frontend/drivers/platform_switch.o \
+		frontend/drivers/platform_nx.o \
 		frontend/drivers/platform_null.o \
 		libretro-common/file/file_path.o \
 		libretro-common/hash/rhash.o \
@@ -98,10 +98,10 @@ INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
 ROMFS	    :=	romfs
 
-#APP_TITLE := RetroArch SNES9x libNX
+APP_TITLE := RetroArch
 APP_ICON := icon.jpg
-APP_VERSION := 0.8
-APP_AUTHOR := M4xw, Credit: Reswitched, libretro
+APP_VERSION := 0.9.5
+APP_AUTHOR := RetroNX Team
 
 #---------------------------------------------------------------------------------
 # options for code generation

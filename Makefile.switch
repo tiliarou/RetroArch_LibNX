@@ -78,10 +78,10 @@ INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
 ROMFS	    :=	romfs
 
-#APP_TITLE := RetroNX
+APP_TITLE := RetroArch
 APP_ICON := icon.jpg
 APP_VERSION := 0.9.5
-APP_AUTHOR := M4xw, Credit: Reswitched, libretro
+APP_AUTHOR := RetroNX Team
 
 #---------------------------------------------------------------------------------
 # options for code generation

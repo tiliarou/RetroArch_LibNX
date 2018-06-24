@@ -1,3 +1,18 @@
+/*  RetroArch - A frontend for libretro.
+ *  Copyright (C) - RetroNX Team
+ *
+ *  RetroArch is free software: you can redistribute it and/or modify it under the terms
+ *  of the GNU General Public License as published by the Free Software Found-
+ *  ation, either version 3 of the License, or (at your option) any later version.
+ *
+ *  RetroArch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *  PURPOSE.  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with RetroArch.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
@@ -33,10 +48,10 @@
 #endif
 #endif
 
-static enum frontend_fork switch_fork_mode = FRONTEND_FORK_NONE;
+static enum frontend_fork nx_fork_mode = FRONTEND_FORK_NONE;
 static const char *elf_path_cst = "/switch/retroarch_switch.nro";
 
-static uint64_t frontend_switch_get_mem_used(void);
+static uint64_t frontend_nx_get_mem_used(void);
 
 static void get_first_valid_core(char *path_return)
 {
@@ -65,7 +80,7 @@ static void get_first_valid_core(char *path_return)
     }
 }
 
-static void frontend_switch_get_environment_settings(int *argc, char *argv[], void *args, void *params_data)
+static void frontend_nx_get_environment_settings(int *argc, char *argv[], void *args, void *params_data)
 {
     (void)args;
 
@@ -123,14 +138,14 @@ static void frontend_switch_get_environment_settings(int *argc, char *argv[], vo
                        file_path_str(FILE_PATH_MAIN_CONFIG), sizeof(g_defaults.path.config));
 }
 
-static void frontend_switch_deinit(void *data)
+static void frontend_nx_deinit(void *data)
 {
     (void)data;
 
     gfxExit();
 }
 
-static void frontend_switch_exec(const char *path, bool should_load_game)
+static void frontend_nx_exec(const char *path, bool should_load_game)
 {
     char game_path[PATH_MAX];
     const char *arg_data[3];
@@ -195,23 +210,23 @@ static void frontend_switch_exec(const char *path, bool should_load_game)
 }
 
 #ifndef IS_SALAMANDER
-static bool frontend_switch_set_fork(enum frontend_fork fork_mode)
+static bool frontend_nx_set_fork(enum frontend_fork fork_mode)
 {
     switch (fork_mode)
     {
     case FRONTEND_FORK_CORE:
         RARCH_LOG("FRONTEND_FORK_CORE\n");
-        switch_fork_mode = fork_mode;
+        nx_fork_mode = fork_mode;
         break;
     case FRONTEND_FORK_CORE_WITH_ARGS:
         RARCH_LOG("FRONTEND_FORK_CORE_WITH_ARGS\n");
-        switch_fork_mode = fork_mode;
+        nx_fork_mode = fork_mode;
         break;
     case FRONTEND_FORK_RESTART:
         RARCH_LOG("FRONTEND_FORK_RESTART\n");
         /*  NOTE: We don't implement Salamander, so just turn
              this into FRONTEND_FORK_CORE. */
-        switch_fork_mode = FRONTEND_FORK_CORE;
+        nx_fork_mode = FRONTEND_FORK_CORE;
         break;
     case FRONTEND_FORK_NONE:
     default:
@@ -222,14 +237,14 @@ static bool frontend_switch_set_fork(enum frontend_fork fork_mode)
 }
 #endif
 
-static void frontend_switch_exitspawn(char *s, size_t len)
+static void frontend_nx_exitspawn(char *s, size_t len)
 {
     bool should_load_game = false;
 #ifndef IS_SALAMANDER
-    if (switch_fork_mode == FRONTEND_FORK_NONE)
+    if (nx_fork_mode == FRONTEND_FORK_NONE)
         return;
 
-    switch (switch_fork_mode)
+    switch (nx_fork_mode)
     {
     case FRONTEND_FORK_CORE_WITH_ARGS:
         should_load_game = true;
@@ -238,10 +253,10 @@ static void frontend_switch_exitspawn(char *s, size_t len)
         break;
     }
 #endif
-    frontend_switch_exec(s, should_load_game);
+    frontend_nx_exec(s, should_load_game);
 }
 
-static void frontend_switch_shutdown(bool unused)
+static void frontend_nx_shutdown(bool unused)
 {
     (void)unused;
 #if defined(SWITCH) && defined(NXLINK)
@@ -249,7 +264,7 @@ static void frontend_switch_shutdown(bool unused)
 #endif
 }
 
-static void frontend_switch_init(void *data)
+static void frontend_nx_init(void *data)
 {
     (void)data;
 
@@ -274,18 +289,18 @@ static void frontend_switch_init(void *data)
     printf("[Video]: Video initialized\n");
 }
 
-static int frontend_switch_get_rating(void)
+static int frontend_nx_get_rating(void)
 {
     // Uhh, guess thats fine?
     return 1337;
 }
 
-enum frontend_architecture frontend_switch_get_architecture(void)
+enum frontend_architecture frontend_nx_get_architecture(void)
 {
     return FRONTEND_ARCH_ARMV8;
 }
 
-static int frontend_switch_parse_drive_list(void *data, bool load_content)
+static int frontend_nx_parse_drive_list(void *data, bool load_content)
 {
 #ifndef IS_SALAMANDER
     file_list_t *list = (file_list_t *)data;
@@ -302,16 +317,16 @@ static int frontend_switch_parse_drive_list(void *data, bool load_content)
     return 0;
 }
 
-static uint64_t frontend_switch_get_mem_total(void)
+static uint64_t frontend_nx_get_mem_total(void)
 {
     uint64_t memoryTotal = 0;
     svcGetInfo(&memoryTotal, 6, CUR_PROCESS_HANDLE, 0); // avaiable
-    memoryTotal += frontend_switch_get_mem_used();
+    memoryTotal += frontend_nx_get_mem_used();
 
     return memoryTotal;
 }
 
-static uint64_t frontend_switch_get_mem_used(void)
+static uint64_t frontend_nx_get_mem_used(void)
 {
     uint64_t memoryUsed = 0;
     svcGetInfo(&memoryUsed, 7, CUR_PROCESS_HANDLE, 0); // used
@@ -319,13 +334,13 @@ static uint64_t frontend_switch_get_mem_used(void)
     return memoryUsed;
 }
 
-static enum frontend_powerstate frontend_switch_get_powerstate(int *seconds, int *percent)
+static enum frontend_powerstate frontend_nx_get_powerstate(int *seconds, int *percent)
 {
     // This is fine monkaS
     return FRONTEND_POWERSTATE_CHARGED;
 }
 
-static void frontend_switch_get_os(char *s, size_t len, int *major, int *minor)
+static void frontend_nx_get_os(char *s, size_t len, int *major, int *minor)
 {
     strlcpy(s, "Horizon OS", len);
 
@@ -358,35 +373,35 @@ static void frontend_switch_get_os(char *s, size_t len, int *major, int *minor)
     }
 }
 
-static void frontend_switch_get_name(char *s, size_t len)
+static void frontend_nx_get_name(char *s, size_t len)
 {
     // TODO: Add Mariko at some point
     strlcpy(s, "Nintendo Switch", len);
 }
 
-frontend_ctx_driver_t frontend_ctx_switch =
+frontend_ctx_driver_t frontend_ctx_nx =
     {
-        frontend_switch_get_environment_settings,
-        frontend_switch_init,
-        frontend_switch_deinit,
-        frontend_switch_exitspawn,
+        frontend_nx_get_environment_settings,
+        frontend_nx_init,
+        frontend_nx_deinit,
+        frontend_nx_exitspawn,
         NULL, /* process_args */
-        frontend_switch_exec,
+        frontend_nx_exec,
 #ifdef IS_SALAMANDER
         NULL,
 #else
-        frontend_switch_set_fork,
+        frontend_nx_set_fork,
 #endif
-        frontend_switch_shutdown,
-        frontend_switch_get_name,
-        frontend_switch_get_os,
-        frontend_switch_get_rating,
+        frontend_nx_shutdown,
+        frontend_nx_get_name,
+        frontend_nx_get_os,
+        frontend_nx_get_rating,
         NULL, /* load_content */
-        frontend_switch_get_architecture,
-        frontend_switch_get_powerstate,
-        frontend_switch_parse_drive_list,
-        frontend_switch_get_mem_total,
-        frontend_switch_get_mem_used,
+        frontend_nx_get_architecture,
+        frontend_nx_get_powerstate,
+        frontend_nx_parse_drive_list,
+        frontend_nx_get_mem_total,
+        frontend_nx_get_mem_used,
         NULL, /* install_signal_handler */
         NULL, /* get_signal_handler_state */
         NULL, /* set_signal_handler_state */

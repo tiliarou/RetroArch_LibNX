@@ -139,7 +139,7 @@ ifeq ($(TARGET), retroarch_3ds)
 endif
 
 ifeq ($(TARGET), retroarch_switch)
-	OBJ += frontend/drivers/platform_switch.o
+	OBJ += frontend/drivers/platform_nx.o
 endif
 
 # Git
@@ -883,10 +883,10 @@ ifeq ($(TARGET), retroarch_3ds)
 endif
 
 ifeq ($(TARGET), retroarch_switch)
-	OBJ += input/drivers_joypad/switch_joypad.o \
-         audio/drivers/switch_audio.o \
-         input/drivers/switch_input.o \
-         gfx/drivers/switch_gfx.o
+	OBJ += input/drivers_joypad/nx_joypad.o \
+         audio/drivers/nx_audio.o \
+         input/drivers/nx_input.o \
+         gfx/drivers/nx_gfx.o
 endif
 
 ifeq ($(HAVE_WAYLAND), 1)

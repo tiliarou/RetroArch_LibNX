@@ -295,7 +295,7 @@ static const video_driver_t *video_drivers[] = {
    &video_ctr,
 #endif
 #ifdef SWITCH
-   &video_switch,
+   &video_nx,
 #endif
 #ifdef HAVE_SDL
    &video_sdl,

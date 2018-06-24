@@ -1,3 +1,18 @@
+/*  RetroArch - A frontend for libretro.
+ *  Copyright (C) - RetroNX Team
+ *
+ *  RetroArch is free software: you can redistribute it and/or modify it under the terms
+ *  of the GNU General Public License as published by the Free Software Found-
+ *  ation, either version 3 of the License, or (at your option) any later version.
+ *
+ *  RetroArch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *  PURPOSE.  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with RetroArch.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -129,15 +144,15 @@ typedef struct
       bool o_size;
       uint32_t o_height;
       uint32_t o_width;
-} switch_video_t;
+} nx_video_t;
 
-static void *switch_init(const video_info_t *video,
+static void *nx_init(const video_info_t *video,
                          const input_driver_t **input, void **input_data)
 {
       unsigned x, y;
       void *switchinput = NULL;
 
-      switch_video_t *sw = (switch_video_t *)calloc(1, sizeof(*sw));
+      nx_video_t *sw = (nx_video_t *)calloc(1, sizeof(*sw));
       if (!sw)
             return NULL;
 
@@ -163,20 +178,20 @@ static void *switch_init(const video_info_t *video,
       if (input && input_data)
       {
             settings_t *settings = config_get_ptr();
-            switchinput = input_switch.init(settings->arrays.input_joypad_driver);
-            *input = switchinput ? &input_switch : NULL;
+            switchinput = input_nx.init(settings->arrays.input_joypad_driver);
+            *input = switchinput ? &input_nx : NULL;
             *input_data = switchinput;
       }
 
       return sw;
 }
 
-static void switch_wait_vsync(switch_video_t *sw)
+static void nx_wait_vsync(nx_video_t *sw)
 {
       gfxWaitForVsync();
 }
 
-static void switch_update_viewport(switch_video_t *sw, video_frame_info_t *video_info)
+static void nx_update_viewport(nx_video_t *sw, video_frame_info_t *video_info)
 {
       int x = 0;
       int y = 0;
@@ -260,9 +275,9 @@ static void switch_update_viewport(switch_video_t *sw, video_frame_info_t *video
       }
 }
 
-static void switch_set_aspect_ratio(void *data, unsigned aspect_ratio_idx)
+static void nx_set_aspect_ratio(void *data, unsigned aspect_ratio_idx)
 {
-      switch_video_t *sw = (switch_video_t *)data;
+      nx_video_t *sw = (nx_video_t *)data;
 
       if (!sw)
             return;
@@ -306,7 +321,7 @@ static void switch_set_aspect_ratio(void *data, unsigned aspect_ratio_idx)
       sw->should_resize = true;
 }
 
-static bool switch_frame(void *data, const void *frame,
+static bool nx_frame(void *data, const void *frame,
                          unsigned width, unsigned height,
                          uint64_t frame_count, unsigned pitch,
                          const char *msg, video_frame_info_t *video_info)
@@ -319,13 +334,13 @@ static bool switch_frame(void *data, const void *frame,
 
       unsigned x, y;
       uint32_t *out_buffer = NULL;
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
 
       if (sw->should_resize)
       {
             printf("[Video] Requesting new size\n");
             printf("[Video] fw: %i fh: %i w: %i h: %i x: %i y: %i\n", sw->vp.full_width, sw->vp.full_height, sw->vp.width, sw->vp.height, sw->vp.x, sw->vp.y);
-            switch_update_viewport(sw, video_info);
+            nx_update_viewport(sw, video_info);
             printf("[Video] fw: %i fh: %i w: %i h: %i x: %i y: %i\n", sw->vp.full_width, sw->vp.full_height, sw->vp.width, sw->vp.height, sw->vp.x, sw->vp.y);
 
             scaler_ctx_gen_reset(&sw->scaler);
@@ -417,54 +432,54 @@ static bool switch_frame(void *data, const void *frame,
       gfxFlushBuffers();
       gfxSwapBuffers();
       if (sw->vsync)
-            switch_wait_vsync(sw);
+            nx_wait_vsync(sw);
 
       last_frame = svcGetSystemTick();
 
       return true;
 }
 
-static void switch_set_nonblock_state(void *data, bool toggle)
+static void nx_set_nonblock_state(void *data, bool toggle)
 {
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
       sw->vsync = !toggle;
 }
 
-static bool switch_alive(void *data)
+static bool nx_alive(void *data)
 {
       (void)data;
       return true;
 }
 
-static bool switch_focus(void *data)
+static bool nx_focus(void *data)
 {
       (void)data;
       return true;
 }
 
-static bool switch_suppress_screensaver(void *data, bool enable)
+static bool nx_suppress_screensaver(void *data, bool enable)
 {
       (void)data;
       (void)enable;
       return false;
 }
 
-static bool switch_has_windowed(void *data)
+static bool nx_has_windowed(void *data)
 {
       (void)data;
       return false;
 }
 
-static void switch_free(void *data)
+static void nx_free(void *data)
 {
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
       if (sw->menu_texture.pixels)
             free(sw->menu_texture.pixels);
 
       free(sw);
 }
 
-static bool switch_set_shader(void *data,
+static bool nx_set_shader(void *data,
                               enum rarch_shader_type type, const char *path)
 {
       (void)data;
@@ -474,21 +489,21 @@ static bool switch_set_shader(void *data,
       return false;
 }
 
-static void switch_set_rotation(void *data, unsigned rotation)
+static void nx_set_rotation(void *data, unsigned rotation)
 {
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
       if (!sw)
             return;
       sw->rotation = rotation;
 }
 
-static void switch_viewport_info(void *data, struct video_viewport *vp)
+static void nx_viewport_info(void *data, struct video_viewport *vp)
 {
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
       *vp = sw->vp;
 }
 
-static bool switch_read_viewport(void *data, uint8_t *buffer, bool is_idle)
+static bool nx_read_viewport(void *data, uint8_t *buffer, bool is_idle)
 {
       (void)data;
       (void)buffer;
@@ -496,12 +511,12 @@ static bool switch_read_viewport(void *data, uint8_t *buffer, bool is_idle)
       return true;
 }
 
-static void switch_set_texture_frame(
+static void nx_set_texture_frame(
     void *data, const void *frame, bool rgb32,
     unsigned width, unsigned height, float alpha)
 {
 
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
 
       if (!sw->menu_texture.pixels ||
           sw->menu_texture.width != width ||
@@ -554,24 +569,24 @@ static void switch_set_texture_frame(
       memcpy(sw->menu_texture.pixels, frame, width * height * (rgb32 ? 4 : 2));
 }
 
-static void switch_apply_state_changes(void *data)
+static void nx_apply_state_changes(void *data)
 {
-      switch_video_t *sw = (switch_video_t *)data;
+      nx_video_t *sw = (nx_video_t *)data;
 }
 
-static void switch_set_texture_enable(void *data, bool enable, bool full_screen)
+static void nx_set_texture_enable(void *data, bool enable, bool full_screen)
 {
-      switch_video_t *sw = data;
+      nx_video_t *sw = data;
       sw->menu_texture.enable = enable;
       sw->menu_texture.fullscreen = full_screen;
 }
 
 #ifdef HAVE_OVERLAY
-static void switch_overlay_enable(void *data, bool state)
+static void nx_overlay_enable(void *data, bool state)
 {
       printf("[Video] Enabled Overlay\n");
 
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
 
       if (!swa)
             return;
@@ -579,10 +594,10 @@ static void switch_overlay_enable(void *data, bool state)
       swa->overlay_enabled = state;
 }
 
-static bool switch_overlay_load(void *data,
+static bool nx_overlay_load(void *data,
                                 const void *image_data, unsigned num_images)
 {
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
 
       struct texture_image *images = (struct texture_image *)image_data;
 
@@ -595,57 +610,57 @@ static bool switch_overlay_load(void *data,
       return true;
 }
 
-static void switch_overlay_tex_geom(void *data,
+static void nx_overlay_tex_geom(void *data,
                                     unsigned idx, float x, float y, float w, float h)
 {
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
 
       if (!swa)
             return;
 }
 
-static void switch_overlay_vertex_geom(void *data,
+static void nx_overlay_vertex_geom(void *data,
                                        unsigned idx, float x, float y, float w, float h)
 {
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
 
       if (!swa)
             return;
 }
 
-static void switch_overlay_full_screen(void *data, bool enable)
+static void nx_overlay_full_screen(void *data, bool enable)
 {
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
 }
 
-static void switch_overlay_set_alpha(void *data, unsigned idx, float mod)
+static void nx_overlay_set_alpha(void *data, unsigned idx, float mod)
 {
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
 
       if (!swa)
             return;
 }
 
-static const video_overlay_interface_t switch_overlay = {
-    switch_overlay_enable,
-    switch_overlay_load,
-    switch_overlay_tex_geom,
-    switch_overlay_vertex_geom,
-    switch_overlay_full_screen,
-    switch_overlay_set_alpha,
+static const video_overlay_interface_t nx_overlay = {
+    nx_overlay_enable,
+    nx_overlay_load,
+    nx_overlay_tex_geom,
+    nx_overlay_vertex_geom,
+    nx_overlay_full_screen,
+    nx_overlay_set_alpha,
 };
 
-void switch_overlay_interface(void *data, const video_overlay_interface_t **iface)
+void nx_overlay_interface(void *data, const video_overlay_interface_t **iface)
 {
-      switch_video_t *swa = (switch_video_t *)data;
+      nx_video_t *swa = (nx_video_t *)data;
       if (!swa)
             return;
-      *iface = &switch_overlay;
+      *iface = &nx_overlay;
 }
 
 #endif
 
-static const video_poke_interface_t switch_poke_interface = {
+static const video_poke_interface_t nx_poke_interface = {
     NULL,                       /* get_flags */
     NULL,                       /* set_coords */
     NULL,                       /* set_mvp */
@@ -659,10 +674,10 @@ static const video_poke_interface_t switch_poke_interface = {
     NULL,                       /* get_video_output_next */
     NULL,                       /* get_current_framebuffer */
     NULL,                       /* get_proc_address */
-    switch_set_aspect_ratio,    /* set_aspect_ratio */
-    switch_apply_state_changes, /* apply_state_changes */
-    switch_set_texture_frame,
-    switch_set_texture_enable,
+    nx_set_aspect_ratio,    /* set_aspect_ratio */
+    nx_apply_state_changes, /* apply_state_changes */
+    nx_set_texture_frame,
+    nx_set_texture_enable,
     NULL, /* set_osd_msg */
     NULL, /* show_mouse */
     NULL, /* grab_mouse_toggle */
@@ -671,31 +686,31 @@ static const video_poke_interface_t switch_poke_interface = {
     NULL, /* get_hw_render_interface */
 };
 
-static void switch_get_poke_interface(void *data,
+static void nx_get_poke_interface(void *data,
                                       const video_poke_interface_t **iface)
 {
       (void)data;
-      *iface = &switch_poke_interface;
+      *iface = &nx_poke_interface;
 }
 
-video_driver_t video_switch = {
-    switch_init,
-    switch_frame,
-    switch_set_nonblock_state,
-    switch_alive,
-    switch_focus,
-    switch_suppress_screensaver,
-    switch_has_windowed,
-    switch_set_shader,
-    switch_free,
+video_driver_t video_nx = {
+    nx_init,
+    nx_frame,
+    nx_set_nonblock_state,
+    nx_alive,
+    nx_focus,
+    nx_suppress_screensaver,
+    nx_has_windowed,
+    nx_set_shader,
+    nx_free,
     "switch",
     NULL, /* set_viewport */
-    switch_set_rotation,
-    switch_viewport_info,
-    switch_read_viewport,
+    nx_set_rotation,
+    nx_viewport_info,
+    nx_read_viewport,
     NULL, /* read_frame_raw */
 #ifdef HAVE_OVERLAY
-    switch_overlay_interface, /* switch_overlay_interface */
+    nx_overlay_interface, /* nx_overlay_interface */
 #endif
-    switch_get_poke_interface,
+    nx_get_poke_interface,
 };
