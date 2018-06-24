@@ -315,7 +315,8 @@ enum menu_display_driver_type
    MENU_VIDEO_DRIVER_WIIU,
    MENU_VIDEO_DRIVER_CACA,
    MENU_VIDEO_DRIVER_GDI,
-   MENU_VIDEO_DRIVER_VGA
+   MENU_VIDEO_DRIVER_VGA,
+   MENU_VIDEO_DRIVER_SWITCH
 };
 
 enum menu_toggle_reason
