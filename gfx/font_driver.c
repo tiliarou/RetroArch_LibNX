@@ -531,7 +531,7 @@ static bool font_init_first(
 {
    if (font_path && !font_path[0])
       font_path = NULL;
-
+      
    switch (api)
    {
 #ifdef HAVE_OPENGL

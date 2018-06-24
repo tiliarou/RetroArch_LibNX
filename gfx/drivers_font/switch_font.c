@@ -11,8 +11,12 @@
 
 #include "../../verbosity.h"
 
+#include "../common/switch_common.h"
+
 typedef struct
 {
+   switch_texture_t texture;
+
    const font_renderer_driver_t* font_driver;
    void* font_data;
 } switch_font_t;
@@ -20,6 +24,36 @@ typedef struct
 static void* switch_font_init_font(void* data, const char* font_path,
       float font_size, bool is_threaded)
 {
+   const struct font_atlas* atlas = NULL;
+   switch_font_t* font = (switch_font_t*)calloc(1, sizeof(*font));
+   switch_video_t* sw = (switch_video_t*)data;
+
+   if (!font)
+      return NULL;
+
+   font_size = 10;
+   if (!font_renderer_create_default((const void**)&font->font_driver,
+                                     &font->font_data, font_path, font_size))
+   {
+      RARCH_WARN("Couldn't initialize font renderer.\n");
+      free(font);
+      return NULL;
+   }
+
+   atlas = font->font_driver->get_atlas(font->font_data);
+
+   font->texture.width = next_pow2(atlas->width);
+   font->texture.height = next_pow2(atlas->height);
+
+   font->texture.data = malloc(font->texture.width * font->texture.height);
+   uint8_t* tmp = font->texture.data;
+
+   int i, j;
+   const uint8_t*     src = atlas->buffer;
+
+   //This is where I stopped writing this and went on my journey to rename
+   //switch to nx everywhere in the project
+
    return NULL;
 }
 

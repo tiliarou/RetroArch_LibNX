@@ -1,0 +1,54 @@
+#ifndef SWITCH_COMMON_H__
+#define SWITCH_COMMON_H__
+
+#include <switch.h>
+#include <gfx/scaler/scaler.h>
+
+typedef struct
+{
+      bool vsync;
+      bool rgb32;
+      unsigned width, height;
+      unsigned rotation;
+      struct video_viewport vp;
+      struct texture_image *overlay;
+      bool overlay_enabled;
+      struct
+      {
+            bool enable;
+            bool fullscreen;
+
+            uint32_t *pixels;
+
+            uint32_t width;
+            uint32_t height;
+
+            unsigned tgtw;
+            unsigned tgth;
+
+            struct scaler_ctx scaler;
+      } menu_texture;
+
+      uint32_t image[1280 * 720];
+      u32 cnt;
+      struct scaler_ctx scaler;
+      uint32_t last_width;
+      uint32_t last_height;
+      bool keep_aspect;
+      bool should_resize;
+
+      bool o_size;
+      uint32_t o_height;
+      uint32_t o_width;
+} switch_video_t;
+
+typedef struct
+{
+   int width;
+   int height;
+
+   enum texture_filter_type type;
+   void* data;
+} switch_texture_t;
+
+#endif
