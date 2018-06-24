@@ -136,6 +136,9 @@ static menu_display_ctx_driver_t *menu_display_ctx_drivers[] = {
 #ifdef DJGPP
    &menu_display_ctx_vga,
 #endif
+#if defined(__SWITCH__)
+   &menu_display_ctx_switch,
+#endif
    &menu_display_ctx_null,
    NULL,
 };
