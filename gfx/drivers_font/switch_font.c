@@ -15,7 +15,7 @@
 
 typedef struct
 {
-   switch_texture_t texture;
+   struct font_atlas* atlas;
 
    const font_renderer_driver_t* font_driver;
    void* font_data;
@@ -24,9 +24,8 @@ typedef struct
 static void* switch_font_init_font(void* data, const char* font_path,
       float font_size, bool is_threaded)
 {
-   const struct font_atlas* atlas = NULL;
    switch_font_t* font = (switch_font_t*)calloc(1, sizeof(*font));
-   switch_video_t* sw = (switch_video_t*)data;
+   //switch_video_t* sw = (switch_video_t*)data;
 
    if (!font)
       return NULL;
@@ -40,26 +39,26 @@ static void* switch_font_init_font(void* data, const char* font_path,
       return NULL;
    }
 
-   atlas = font->font_driver->get_atlas(font->font_data);
+   font->atlas = font->font_driver->get_atlas(font->font_data);
 
-   font->texture.width = next_pow2(atlas->width);
-   font->texture.height = next_pow2(atlas->height);
+   //TODO Scaling ?
 
-   font->texture.data = malloc(font->texture.width * font->texture.height);
-   uint8_t* tmp = font->texture.data;
+   RARCH_LOG("Switch font driver initialized with backend %s\n", font->font_driver->ident);
 
-   int i, j;
-   const uint8_t*     src = atlas->buffer;
-
-   //This is where I stopped writing this and went on my journey to rename
-   //switch to nx everywhere in the project
-
-   return NULL;
+   return font;
 }
 
 static void switch_font_free_font(void* data, bool is_threaded)
 {
-   (void)data;
+   switch_font_t* font = (switch_font_t*)data;
+
+   if (!font)
+      return;
+
+   if (font->font_driver && font->font_data)
+      font->font_driver->free(font->font_data);
+
+   free(font);
 }
 
 static int switch_font_get_message_width(void* data, const char* msg,
@@ -103,7 +102,70 @@ static void switch_font_render_line(
       float scale, const unsigned int color, float pos_x,
       float pos_y, unsigned text_align)
 {
-   return;
+   unsigned width   = video_info->width;
+   unsigned height  = video_info->height;
+   int x            = roundf(pos_x * width);
+   int y            = roundf((1.0f - pos_y) * height);
+
+   int delta_x = 0;
+   int delta_y = 0;
+
+   switch_video_t* sw = (switch_video_t*)video_info->userdata;
+
+   switch (text_align)
+   {
+      case TEXT_ALIGN_RIGHT:
+         x -= switch_font_get_message_width(font, msg, msg_len, scale);
+         break;
+      case TEXT_ALIGN_CENTER:
+         x -= switch_font_get_message_width(font, msg, msg_len, scale) / 2.0;
+         break;
+   }
+
+   for (int i = 0; i < msg_len; i++)
+   {
+      int off_x, off_y, tex_x, tex_y, width, height;
+      const char* msg_tmp            = &msg[i];
+      unsigned code                  = utf8_walk(&msg_tmp);
+      unsigned skip                  = msg_tmp - &msg[i];
+
+      if (skip > 1)
+         i += skip - 1;
+
+      const struct font_glyph* glyph =
+         font->font_driver->get_glyph(font->font_data, code);
+
+      if (!glyph) /* Do something smarter here ... */
+         glyph = font->font_driver->get_glyph(font->font_data, '?');
+
+      if (!glyph)
+         continue;
+
+      off_x  = glyph->draw_offset_x;
+      off_y  = glyph->draw_offset_y;
+      tex_x  = glyph->atlas_offset_x;
+      tex_y  = glyph->atlas_offset_y;
+      width  = glyph->width;
+      height = glyph->height;
+
+      //TODO memcpy
+      //TODO Scaling
+
+      //For each "pixel" in the glyph
+      for (int i = tex_y; i < tex_y + height; ++i)
+      {
+         const uint8_t* src = &font->atlas->buffer[i * font->atlas->width];
+         for (int j = tex_x; j < tex_x + width; ++j)
+         {
+            //TODO Draw the proper color as uint32 instead of putting the "pixel" like that
+            const uint8_t pixel = src[j]; //alpha channel of the glyph "pixel"
+            sw->image[1280 * (y + off_y + delta_y + i) + (x + off_x + delta_x + j)] = pixel; //TODO Fix this
+         }
+      }
+      
+      delta_x += glyph->advance_x;
+      delta_y += glyph->advance_y;
+   }
 }
 
 static void switch_font_render_message(

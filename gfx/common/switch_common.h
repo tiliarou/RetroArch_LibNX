@@ -42,13 +42,4 @@ typedef struct
       uint32_t o_width;
 } switch_video_t;
 
-typedef struct
-{
-   int width;
-   int height;
-
-   enum texture_filter_type type;
-   void* data;
-} switch_texture_t;
-
 #endif

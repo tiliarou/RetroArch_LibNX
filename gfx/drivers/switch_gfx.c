@@ -365,9 +365,6 @@ static bool switch_frame(void *data, const void *frame,
             }
       }
 
-      //if (msg && strlen(msg) > 0)
-      //      printf("message: %s\n", msg);
-
       width = 0;
       height = 0;
 
@@ -380,6 +377,9 @@ static bool switch_frame(void *data, const void *frame,
       {
             sw->cnt++;
       }
+      
+      if (msg)
+            font_driver_render_msg(video_info, NULL, msg, NULL);
 
       gfx_slow_swizzling_blit(out_buffer, sw->image, sw->vp.full_width, sw->vp.full_height, 0, 0);
       gfxFlushBuffers();
@@ -534,6 +534,17 @@ static void switch_set_texture_enable(void *data, bool enable, bool full_screen)
       sw->menu_texture.fullscreen = full_screen;
 }
 
+static void switch_set_osd_msg(void *data,
+      video_frame_info_t *video_info,
+      const char *msg,
+      const void *params, void *font)
+{
+   switch_video_t* sw = (switch_video_t*)data;
+
+   if (sw)
+      font_driver_render_msg(video_info, font, msg, params);
+}
+
 #ifdef HAVE_OVERLAY
 static void switch_overlay_enable(void *data, bool state)
 {
@@ -631,7 +642,7 @@ static const video_poke_interface_t switch_poke_interface = {
     switch_apply_state_changes, /* apply_state_changes */
     switch_set_texture_frame,
     switch_set_texture_enable,
-    NULL, /* set_osd_msg */
+    switch_set_osd_msg,
     NULL, /* show_mouse */
     NULL, /* grab_mouse_toggle */
     NULL, /* get_current_shader */
