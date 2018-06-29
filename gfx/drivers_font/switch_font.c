@@ -96,6 +96,8 @@ static int switch_font_get_message_width(void* data, const char* msg,
    return delta_x * scale;
 }
 
+#define FONT_SCALE 3
+
 static void switch_font_render_line(
       video_frame_info_t *video_info,
       switch_font_t* font, const char* msg, unsigned msg_len,
@@ -110,7 +112,10 @@ static void switch_font_render_line(
    int delta_x = 0;
    int delta_y = 0;
 
-   switch_video_t* sw = (switch_video_t*)video_info->userdata;
+   unsigned fbWidth;
+   unsigned fbHeight;
+
+   uint32_t* out_buffer = (uint32_t *)gfxGetFramebuffer(&fbWidth, &fbHeight);
 
    switch (text_align)
    {
@@ -141,27 +146,44 @@ static void switch_font_render_line(
       if (!glyph)
          continue;
 
-      off_x  = glyph->draw_offset_x;
-      off_y  = glyph->draw_offset_y;
-      tex_x  = glyph->atlas_offset_x;
-      tex_y  = glyph->atlas_offset_y;
+      off_x  = glyph->draw_offset_x * FONT_SCALE;
+      off_y  = glyph->draw_offset_y* FONT_SCALE;
       width  = glyph->width;
       height = glyph->height;
 
-      //TODO memcpy
-      //TODO Scaling
+      tex_x  = glyph->atlas_offset_x;
+      tex_y  = glyph->atlas_offset_y;
 
-      //For each "pixel" in the glyph
-      for (int i = tex_y; i < tex_y + height; ++i)
+      //TODO Hook to menu display driver
+
+      uint32_t* glyph_buffer = malloc((width * FONT_SCALE) * (height * FONT_SCALE) * sizeof(uint32_t));
+
+      for (int y = tex_y; y < tex_y + height; y++)
       {
-         const uint8_t* src = &font->atlas->buffer[i * font->atlas->width];
-         for (int j = tex_x; j < tex_x + width; ++j)
-         {
-            //TODO Draw the proper color as uint32 instead of putting the "pixel" like that
-            const uint8_t pixel = src[j]; //alpha channel of the glyph "pixel"
-            sw->image[1280 * (y + off_y + delta_y + i) + (x + off_x + delta_x + j)] = pixel; //TODO Fix this
-         }
+            uint8_t* row = &font->atlas->buffer[y * font->atlas->width];
+            for (int x = tex_x; x < tex_x + width; x++)
+            {
+                  uint8_t alpha = row[x];
+                  uint32_t pixel = RGBA8(0, 255, 0, alpha);
+                  for (int i = 0; i < FONT_SCALE; i++)
+                  {
+                        for (int j = 0; j < FONT_SCALE; j++)
+                        {
+                              int px = (x - tex_x) * FONT_SCALE + j;
+                              int py = (y - tex_y) * FONT_SCALE + i;
+                              glyph_buffer[py * (width * FONT_SCALE) + px] = pixel;
+                        }
+                  }
+                  
+            }
       }
+      
+      int glyphx = x + off_x + delta_x * FONT_SCALE + FONT_SCALE*2;
+      int glyphy = y + off_y + delta_y * FONT_SCALE - FONT_SCALE*2;
+
+      gfx_slow_swizzling_blit(out_buffer, glyph_buffer, width * FONT_SCALE, height * FONT_SCALE, glyphx, fbHeight + glyphy, true);
+
+      free(glyph_buffer);
       
       delta_x += glyph->advance_x;
       delta_y += glyph->advance_y;

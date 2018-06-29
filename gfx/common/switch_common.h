@@ -42,4 +42,6 @@ typedef struct
       uint32_t o_width;
 } switch_video_t;
 
+void gfx_slow_swizzling_blit(uint32_t *buffer, uint32_t *image, int w, int h, int tx, int ty, bool blend);
+
 #endif
