@@ -88,37 +88,14 @@ void gfx_slow_swizzling_blit(uint32_t *buffer, uint32_t *image, int w, int h, in
                   if (blend)
                   {
                         uint32_t dst = dest_line[offs_x];
-
-                        float src_r = ((pixel & 0x000000FF) >> 0) / 255.0f;
-                        float src_g = ((pixel & 0x0000FF00) >> 8) / 255.0f;
-                        float src_b = ((pixel & 0x00FF0000) >> 16) / 255.0f;
                         float src_a = ((pixel & 0xFF000000) >> 24) / 255.0f;
 
-                        float dst_r = ((dst & 0x000000FF) >> 0) / 255.0f;
-                        float dst_g = ((dst & 0x0000FF00) >> 8) / 255.0f;
-                        float dst_b = ((dst & 0x00FF0000) >> 16) / 255.0f;
-                        float dst_a = ((dst & 0xFF000000) >> 24) / 255.0f;
-
-                        float out_a = src_a + dst_a * (1.0f - src_a);
-
-                        float out_r;
-                        float out_g;
-                        float out_b;
-
-                        if (out_a == 0)
+                        if (src_a > 0.0001f)
                         {
-                              out_r = 0;
-                              out_g = 0;
-                              out_b = 0;
+                              pixel &= 0x00FFFFFF;
+                        } else {
+                              pixel = dst;
                         }
-                        else
-                        {
-                              out_r = (src_r * src_a) + (dst_r * (1.0f - src_a));
-                              out_g = (src_g * src_a) + (dst_g * (1.0f - src_a));
-                              out_b = (src_b * src_a) + (dst_b * (1.0f - src_a));
-                        }
-                        
-                        pixel = RGBA8((uint8_t)(out_r * 255.0f), (uint8_t)(out_g * 255.0f), (uint8_t)(out_b * 255.0f), (uint8_t)(out_a * 255.0f));
                   }
 
                   dest_line[offs_x] = pixel;
