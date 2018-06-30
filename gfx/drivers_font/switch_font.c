@@ -13,6 +13,8 @@
 
 #include "../common/switch_common.h"
 
+//TODO Hook to menu display driver
+
 typedef struct
 {
    struct font_atlas* atlas;
@@ -25,7 +27,6 @@ static void* switch_font_init_font(void* data, const char* font_path,
       float font_size, bool is_threaded)
 {
    switch_font_t* font = (switch_font_t*)calloc(1, sizeof(*font));
-   //switch_video_t* sw = (switch_video_t*)data;
 
    if (!font)
       return NULL;
@@ -40,8 +41,6 @@ static void* switch_font_init_font(void* data, const char* font_path,
    }
 
    font->atlas = font->font_driver->get_atlas(font->font_data);
-
-   //TODO Scaling ?
 
    RARCH_LOG("Switch font driver initialized with backend %s\n", font->font_driver->ident);
 
@@ -153,8 +152,6 @@ static void switch_font_render_line(
 
       tex_x  = glyph->atlas_offset_x;
       tex_y  = glyph->atlas_offset_y;
-
-      //TODO Hook to menu display driver
 
       uint32_t* glyph_buffer = malloc((width * FONT_SCALE) * (height * FONT_SCALE) * sizeof(uint32_t));
 
