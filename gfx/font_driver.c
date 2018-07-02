@@ -49,7 +49,6 @@ static void *video_font_driver = NULL;
 int font_renderer_create_default(const void **data, void **handle,
       const char *font_path, unsigned font_size)
 {
-
    unsigned i;
    const font_renderer_driver_t **drv =
       (const font_renderer_driver_t**)data;
