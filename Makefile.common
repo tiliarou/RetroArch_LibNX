@@ -899,6 +899,9 @@ ifeq ($(TARGET), retroarch_switch)
          input/drivers/switch_input.o \
          gfx/drivers/switch_gfx.o \
          menu/drivers_display/menu_display_switch.o
+  ifeq ($(HAVE_DUMMY), 1)
+    OBJ += switch/dummy.o
+  endif
 endif
 
 ifeq ($(HAVE_WAYLAND), 1)
