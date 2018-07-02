@@ -113,44 +113,6 @@ void gfx_slow_swizzling_blit(uint32_t *buffer, uint32_t *image, int w, int h, in
       }
 }
 
-typedef struct
-{
-      struct video_viewport vp;
-      struct scaler_ctx scaler;
-      bool vsync;
-      bool should_resize;
-
-      uint32_t image[1280 * 720];
-      uint32_t tmp_image[1280 * 720];
-
-      struct texture_image *overlay;
-      unsigned rotation;
-      uint32_t last_width;
-      uint32_t last_height;
-      uint32_t o_height;
-      uint32_t o_width;
-      bool o_size;
-      bool keep_aspect;
-      bool overlay_enabled;
-      bool rgb32;
-
-      struct
-      {
-            uint32_t *pixels;
-
-            uint32_t width;
-            uint32_t height;
-
-            unsigned tgtw;
-            unsigned tgth;
-
-            struct scaler_ctx scaler;
-
-            bool enable;
-            bool fullscreen;
-      } menu_texture;
-} switch_video_t;
-
 static void *switch_init(const video_info_t *video,
                          const input_driver_t **input, void **input_data)
 {

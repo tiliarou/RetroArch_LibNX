@@ -30,6 +30,7 @@ typedef struct
       } menu_texture;
 
       uint32_t image[1280 * 720];
+      uint32_t tmp_image[1280 * 720];
       u32 cnt;
       struct scaler_ctx scaler;
       uint32_t last_width;
