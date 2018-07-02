@@ -38,24 +38,26 @@
 
 static inline void lockMutex(Mutex* mtx)
 {
-      mutexLock(mtx);
+      while (!mutexTryLock(mtx))
+            svcSleepThread(3);
 }
 
 typedef struct
 {
       fifo_buffer_t* fifo;
       Mutex fifoLock;
-      Thread thread;
       CondVar cond;
       Mutex condLock;
+
+      size_t fifoSize;
 
       volatile bool running;
       bool nonblocking;
       bool is_paused;
 
       AudioOutBuffer buffer[AUDIO_BUFFER_COUNT];
+      Thread thread;
 
-      size_t fifoSize;
       unsigned latency;
       uint32_t sampleRate;
 } switch_thread_audio_t;
@@ -111,9 +113,9 @@ static void mainLoop(void* data)
             mutexUnlock(&swa->fifoLock);
             condvarWakeAll(&swa->cond);
 
-            if (to_write > 0)
+            released_out_buffer->data_size += to_write;
+            if (released_out_buffer->data_size >= released_out_buffer->buffer_size / 2)
             {
-                  released_out_buffer->data_size += to_write;
                   rc = audoutAppendAudioOutBuffer(released_out_buffer);
                   if (R_FAILED(rc))
                   {
@@ -123,7 +125,7 @@ static void mainLoop(void* data)
             }
             else
             {
-                  svcSleepThread(1000000); // 1ms
+                  svcSleepThread(16000000); // 16ms
             }
       }
 }
@@ -170,7 +172,7 @@ static void *switch_thread_audio_init(const char *device, unsigned rate, unsigne
 
       u32 prio;
       svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
-      rc = threadCreate(&swa->thread, &mainLoop, (void*)swa, THREAD_STACK_SIZE, prio - 1, AUDIO_THREAD_CPU);
+      rc = threadCreate(&swa->thread, &mainLoop, (void*)swa, THREAD_STACK_SIZE, prio + 1, AUDIO_THREAD_CPU);
 
       if (R_FAILED(rc))
       {
