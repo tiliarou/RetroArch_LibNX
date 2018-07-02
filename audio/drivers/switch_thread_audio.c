@@ -28,7 +28,7 @@
 
 #define THREAD_STACK_SIZE (1024 * 8)
 
-#define AUDIO_THREAD_CPU 1
+#define AUDIO_THREAD_CPU 2
 
 #define CHANNELCOUNT 2
 #define BYTESPERSAMPLE sizeof(uint16_t)
