@@ -13,8 +13,6 @@
 
 #include "../common/switch_common.h"
 
-//TODO Hook to menu display driver
-
 typedef struct
 {
    struct font_atlas* atlas;
@@ -105,8 +103,6 @@ static void switch_font_render_line(
 {
    unsigned width   = video_info->width;
    unsigned height  = video_info->height;
-   int x            = roundf(pos_x * width);
-   int y            = roundf((1.0f - pos_y) * height);
 
    int delta_x = 0;
    int delta_y = 0;
@@ -115,6 +111,9 @@ static void switch_font_render_line(
    unsigned fbHeight;
 
    uint32_t* out_buffer = (uint32_t *)gfxGetFramebuffer(&fbWidth, &fbHeight);
+   
+   int x            = roundf(pos_x * fbWidth);
+   int y            = roundf((1.0f - pos_y) * fbHeight);
 
    switch (text_align)
    {

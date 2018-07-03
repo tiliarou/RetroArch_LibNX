@@ -148,7 +148,7 @@ static void frontend_switch_deinit(void *data)
         splashData = NULL;
     }
 
-    //romfsExit();
+    romfsExit();
 
     gfxExit();
 }
@@ -417,7 +417,7 @@ static void frontend_switch_init(void *data)
     printf("[Video]: Video initialized\n");
 
     // RomFs
-    /*Result rc = romfsInit();
+    Result rc = romfsInit();
     if (R_FAILED(rc))
     {
         printf("[RomFS]: %08X\n", rc);
@@ -425,7 +425,7 @@ static void frontend_switch_init(void *data)
     else
     {
         printf("[RomFS]: RomFS initialized\n", rc);
-    */
+    }
     // Load splash
     if (!splashData)
     {
