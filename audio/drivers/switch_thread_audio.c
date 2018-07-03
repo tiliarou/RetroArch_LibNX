@@ -91,12 +91,16 @@ static void mainLoop(void* data)
       {
             if (!released_out_buffer)
             {
-                  rc = audoutWaitPlayFinish(&released_out_buffer, &released_out_count, U64_MAX);
-                  if (R_FAILED(rc))
+                  rc = audoutGetReleasedAudioOutBuffer(&released_out_buffer, &released_out_count);
+                  if (R_FAILED(rc) || !released_out_buffer)
                   {
-                        swa->running = false;
-                        RARCH_LOG("[Audio]: audoutGetReleasedAudioOutBuffer failed: %d\n", (int)rc);
-                        break;
+                        rc = audoutWaitPlayFinish(&released_out_buffer, &released_out_count, U64_MAX);
+                        if (R_FAILED(rc))
+                        {
+                              swa->running = false;
+                              RARCH_LOG("[Audio]: audoutGetReleasedAudioOutBuffer failed: %d\n", (int)rc);
+                              break;
+                        }
                   }
                   released_out_buffer->data_size = 0;
             }
