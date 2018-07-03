@@ -105,7 +105,7 @@ static void switch_font_render_line(
    int delta_y = 0;
 
    unsigned fbWidth;
-   unsigned fbHeight;
+   unsigned fbHeight;  
 
    uint32_t* out_buffer = (uint32_t *)gfxGetFramebuffer(&fbWidth, &fbHeight);
    
@@ -139,7 +139,7 @@ static void switch_font_render_line(
          glyph = font->font_driver->get_glyph(font->font_data, '?');
 
       if (!glyph)
-         continue;
+         continue;      
 
       off_x  = glyph->draw_offset_x * FONT_SCALE;
       off_y  = glyph->draw_offset_y* FONT_SCALE;
@@ -157,7 +157,7 @@ static void switch_font_render_line(
             for (int x = tex_x; x < tex_x + width; x++)
             {
                   uint8_t alpha = row[x];
-                  uint32_t pixel = RGBA8(0, 255, 0, alpha);
+                  uint32_t pixel = RGBA8(255, 255, 255, 255);
                   for (int i = 0; i < FONT_SCALE; i++)
                   {
                         for (int j = 0; j < FONT_SCALE; j++)
@@ -173,7 +173,7 @@ static void switch_font_render_line(
       int glyphx = x + off_x + delta_x * FONT_SCALE + FONT_SCALE*2;
       int glyphy = y + off_y + delta_y * FONT_SCALE - FONT_SCALE*2;
 
-      gfx_slow_swizzling_blit(out_buffer, glyph_buffer, width * FONT_SCALE, height * FONT_SCALE, glyphx, glyphy, true);
+      gfx_slow_swizzling_blit(out_buffer, glyph_buffer, width * FONT_SCALE, height * FONT_SCALE, glyphx, glyphy, true);    
 
       free(glyph_buffer);
       
@@ -245,7 +245,7 @@ static void switch_font_render_msg(
    unsigned height                  = video_info->height;
 
    if (!font || !msg || !*msg)
-      return;
+      return;     
 
    if (params)
    {
@@ -268,7 +268,7 @@ static void switch_font_render_msg(
    else
    {
       x              = 0.0f;
-      y              = 0.0f; //TODO Adjust that
+      y              = 0.0f;
       scale          = 1.0f;
       text_align     = TEXT_ALIGN_LEFT;
 
