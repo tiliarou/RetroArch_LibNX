@@ -13,8 +13,6 @@
 
 #include "../common/switch_common.h"
 
-//TODO Hook to menu display driver
-
 typedef struct
 {
    struct font_atlas* atlas;
@@ -103,18 +101,16 @@ static void switch_font_render_line(
       float scale, const unsigned int color, float pos_x,
       float pos_y, unsigned text_align)
 {
-   unsigned width   = video_info->width;
-   unsigned height  = video_info->height;
-   int x            = roundf(pos_x * width);
-   int y            = roundf((1.0f - pos_y) * height);
-
    int delta_x = 0;
    int delta_y = 0;
 
    unsigned fbWidth;
-   unsigned fbHeight;
+   unsigned fbHeight;  
 
    uint32_t* out_buffer = (uint32_t *)gfxGetFramebuffer(&fbWidth, &fbHeight);
+   
+   int x            = roundf(pos_x * fbWidth);
+   int y            = roundf((1.0f - pos_y) * fbHeight);
 
    switch (text_align)
    {
@@ -143,7 +139,7 @@ static void switch_font_render_line(
          glyph = font->font_driver->get_glyph(font->font_data, '?');
 
       if (!glyph)
-         continue;
+         continue;      
 
       off_x  = glyph->draw_offset_x * FONT_SCALE;
       off_y  = glyph->draw_offset_y* FONT_SCALE;
@@ -153,7 +149,7 @@ static void switch_font_render_line(
       tex_x  = glyph->atlas_offset_x;
       tex_y  = glyph->atlas_offset_y;
 
-      uint32_t* glyph_buffer = malloc((width * FONT_SCALE) * (height * FONT_SCALE) * sizeof(uint32_t));
+      uint32_t* glyph_buffer = malloc((width * FONT_SCALE) * (height * FONT_SCALE) * sizeof(uint32_t)); //TODO Replace this by a large-enough buffer depending on FONT_SCALE
 
       for (int y = tex_y; y < tex_y + height; y++)
       {
@@ -171,14 +167,13 @@ static void switch_font_render_line(
                               glyph_buffer[py * (width * FONT_SCALE) + px] = pixel;
                         }
                   }
-                  
             }
       }
       
       int glyphx = x + off_x + delta_x * FONT_SCALE + FONT_SCALE*2;
       int glyphy = y + off_y + delta_y * FONT_SCALE - FONT_SCALE*2;
 
-      gfx_slow_swizzling_blit(out_buffer, glyph_buffer, width * FONT_SCALE, height * FONT_SCALE, glyphx, fbHeight + glyphy, true);
+      gfx_slow_swizzling_blit(out_buffer, glyph_buffer, width * FONT_SCALE, height * FONT_SCALE, glyphx, glyphy, true);    
 
       free(glyph_buffer);
       
@@ -250,7 +245,7 @@ static void switch_font_render_msg(
    unsigned height                  = video_info->height;
 
    if (!font || !msg || !*msg)
-      return;
+      return;     
 
    if (params)
    {
@@ -272,8 +267,8 @@ static void switch_font_render_msg(
    }
    else
    {
-      x              = video_info->font_msg_pos_x;
-      y              = video_info->font_msg_pos_y;
+      x              = 0.0f;
+      y              = 0.0f;
       scale          = 1.0f;
       text_align     = TEXT_ALIGN_LEFT;
 
@@ -291,7 +286,7 @@ static void switch_font_render_msg(
 
    max_glyphs        = strlen(msg);
 
-   if (drop_x || drop_y)
+   /*if (drop_x || drop_y)
       max_glyphs    *= 2;
 
    if (drop_x || drop_y)
@@ -305,7 +300,7 @@ static void switch_font_render_msg(
       switch_font_render_message(video_info, font, msg, scale, color_dark,
                               x + scale * drop_x / width, y +
                               scale * drop_y / height, text_align);
-   }
+   }*/
 
    switch_font_render_message(video_info, font, msg, scale,
                            color, x, y, text_align);
