@@ -93,7 +93,7 @@ static int switch_font_get_message_width(void *data, const char *msg,
       return delta_x * scale;
 }
 
-#define FONT_SCALE 3
+#define FONT_SCALE 2
 
 static void switch_font_render_line(
     video_frame_info_t *video_info,
