@@ -38,6 +38,7 @@ typedef struct
       bool keep_aspect;
       bool should_resize;
       bool need_clear;
+      bool is_threaded;
 
       bool o_size;
       uint32_t o_height;
