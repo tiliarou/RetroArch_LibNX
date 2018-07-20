@@ -157,7 +157,7 @@ static void switch_font_render_line(
             for (int x = tex_x; x < tex_x + width; x++)
             {
                   uint8_t alpha = row[x];
-                  uint32_t pixel = RGBA8(0, 255, 0, alpha);
+                  uint32_t pixel = RGBA8(255, 255, 255, 255);
                   for (int i = 0; i < FONT_SCALE; i++)
                   {
                         for (int j = 0; j < FONT_SCALE; j++)
