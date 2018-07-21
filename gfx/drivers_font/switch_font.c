@@ -177,11 +177,11 @@ static void switch_font_render_line(
                   // Safeguard
                   if ((glyphx + width * FONT_SCALE) > 1280)
                   {
-                        printf("glpyhx violated %i\n", (glyphx + width * FONT_SCALE));
+                        printf("glpyhx %i (x: %i, off_x: %i, delta_x: %i), violated calc: %i, width: %i\n", glyphx,x, off_x, delta_x, (glyphx + width * FONT_SCALE), width);
                   }
                   else if ((glyphy + height * FONT_SCALE) > 720)
                   {
-                        printf("glyphy violated %i\n", (glyphy + height * FONT_SCALE));
+                        printf("glyphy %i (y: %i, off_y: %i, delta_y: %i) , violated %i, glyphy: %i, heigth: %i\n",glyphy,y, off_y, delta_y, (glyphy + height * FONT_SCALE), glyphy, height);
                   }
                   else
                   {
