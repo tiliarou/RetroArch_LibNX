@@ -120,11 +120,10 @@ void gfx_slow_swizzling_blit(uint32_t *buffer, uint32_t *image, int w, int h, in
 static void clear_screen(switch_video_t* sw)
 {
       gfxConfigureResolution(sw->vp.full_width, sw->vp.full_height);
+
       uint32_t* out_buffer = (uint32_t *)gfxGetFramebuffer(NULL, NULL);
 
-      for (int y = 0; y < sw->vp.full_height; y++)
-          for (int x = 0; x < sw->vp.full_width; x++)
-              out_buffer[gfxGetFramebufferDisplayOffset(x, y)] = RGBA8(0,0,0,0);
+      memset(out_buffer, 0, gfxGetFramebufferSize());
 
       gfxFlushBuffers();
       gfxSwapBuffers();
